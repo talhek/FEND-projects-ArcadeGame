@@ -3,7 +3,30 @@ class Enemy{
     constructor(coordinate_x, coordinate_y, speed){
         this._coordinate_x = coordinate_x;
         this._coordinate_y = coordinate_y;
-        this.speed = speed;
+        this._speed = speed;
+
+        //getters
+        //Axis X coordinate
+        this.getX = function(){
+            return this._coordinate_x;
+        }
+        //Axis Y coordinate
+        this.getY = function(){
+            return this._coordinate_y;
+        }
+        //Speed getter
+        this.getSpeed = function(){
+            return this._speed;
+        }
+        //setters
+        //Axis X setter
+        this.setX = function(coordinate_x){
+            this._coordinate_x = coordinate_x;
+        }
+        //Axis Y setter
+        this.setY = function(coordinate_y){
+            this._coordinate_y = coordinate_y;
+        }
         
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
@@ -15,23 +38,24 @@ class Enemy{
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
-    this._coordinate_x += dt* 100 * this.speed;
-    if (this._coordinate_x >=500){
+    this.setX(this.getX() + (dt * 100 * this.getSpeed()));
+    //this._coordinate_x += dt* 100 * this.getSpeed();
+    if (this.getX() >=500){
         this._coordinate_x = Math.floor((Math.random() * -300) + -50);
         this.speed = Math.floor((Math.random() * 3) + 1);
     }
 }
     // Draw the enemy on the screen, required method for game
     render(){
-    ctx.drawImage(Resources.get(this.sprite), this._coordinate_x, this._coordinate_y);
+    ctx.drawImage(Resources.get(this.sprite), this.getX(), this.getY());
     }
 }
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
 
-
+//checks if a colission occured on the X axis
 function checkAxisX(player, enemy){
-    if((player._coordinate_x >= enemy._coordinate_x -30) && (player._coordinate_x <= enemy._coordinate_x + 20))
+    if((player.getX() >= enemy.getX() -30) && (player.getX() <= enemy.getX() + 20))
     {
         return true;
     }
@@ -39,8 +63,9 @@ function checkAxisX(player, enemy){
         return false;
     }
 }
+//checks if a colission occured on the Y axis
 function checkAxisY(player, enemy){
-    if((player._coordinate_y >= enemy._coordinate_y - 20) && (player._coordinate_y <= enemy._coordinate_y + 20))
+    if((player.getY() >= enemy.getY() - 20) && (player.getY() <= enemy.getY() + 20))
     {
         return true;
     }
@@ -48,7 +73,8 @@ function checkAxisY(player, enemy){
         return false;
     }
 }
-
+//checks if a colission between a player and an enemy object occured
+//if it did, restarting the game
 function check_colission(player, enemy){
 
     if (checkAxisX(player, enemy) && checkAxisY(player, enemy)){
@@ -57,6 +83,7 @@ function check_colission(player, enemy){
     }
 
 }
+//game lost, restarting game by reloading page
 function gameLost(){
     location.reload();
 }
@@ -86,17 +113,7 @@ function gameStats(){
     let modalStats = document.querySelector(".modalStats");
     let modalHeader = document.querySelector(".modalHeader");
 
-    modalHeader.innerHTML = "YOU WON!!!!!!";
-  
-  /*
-    modalStats.innerHTML = "Game rating: " + skills +
-    "Your time: " +
-    document.querySelector("#minutes").innerHTML +
-    " Minutes and " +
-     document.querySelector("#seconds").innerHTML +
-     " Seconds. " +
-    " Total number of moves : " + moves_counter;  
-    */  
+    modalHeader.innerHTML = "YOU WON!!!!!!"; 
 }
 // Now write your own player class
 // This class requires an update(), render() and
@@ -106,42 +123,31 @@ class Player{
         this._coordinate_x = coordinate_x;
         this._coordinate_y = coordinate_y;
         this.sprite = 'images/char-boy.png';
-        /*
+        
+        //getters
         this.getX = function (){
             return this._coordinate_x;
         }
+        this.getY = function(){
+            return this._coordinate_y;
+        }
+        //setters
         this.setX = function (coordinate_x){
             this._coordinate_x = coordinate_x;
-        }
-        this.getY = function(){
-            return this.coordinate_y;
         }
         this.setY = function (coordinate_y){
             this._coordinate_y = coordinate_y;
         }
-        */
+        
     }
     update(dt){
         for (let i = 0; i < allEnemies.length; i++){
             check_colission(this, allEnemies[i]);
         }
-        if (this._coordinate_y <= -30){
-            this._coordinate_y = -30;
-            console.log("water");
-            gameWon();
-        }
-        if (this._coordinate_y >= 385){
-            this._coordinate_y = 385;
-        }
-        if (this._coordinate_x <= 0){
-            this._coordinate_x = 0;
-        }
-        if (this._coordinate_x >= 400){
-            this._coordinate_x = 400;
-        }
-        /*
+        //player cannot step out of map bounds
         if (this.getY() <= -30){
             this.setY(-30);
+            gameWon();
         }
         if(this.getY() >= 385){
             this.setY(385);
@@ -152,10 +158,10 @@ class Player{
         if(this.getX() >= 400){
             this.setX(400);
         }
-        */
+        
     }
     render(){
-        ctx.drawImage(Resources.get(this.sprite), this._coordinate_x, this._coordinate_y);
+        ctx.drawImage(Resources.get(this.sprite), this.getX(), this.getY());
     }
     /* This functions handles the user 'player input
     * and moves the player to the correct direction 
@@ -164,19 +170,16 @@ class Player{
     handleInput(direction){
         switch(direction){
             case "up":
-            this._coordinate_y-=85;
+            this.setY(this.getY() - 85);
             break;
             case "down":
-            //this.setY(this.getY() +85);
-            this._coordinate_y+=85;
+            this.setY(this.getY() +85);
             break;
             case "left":
-            //this.setX(this.getX() -100);
-            this._coordinate_x-=100;
+            this.setX(this.getX() -100);
             break;
             case "right":
-            //this.setX(this.getX() +100);
-            this._coordinate_x+=100;
+            this.setX(this.getX() +100);
             break;
         }
     }
